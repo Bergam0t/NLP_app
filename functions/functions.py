@@ -9,13 +9,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import spacy
-import math 
+import math
 
 #translation library - needs installing into the environment
 #from googletrans import Translator
 
 #alternative preferred translation option on local machine
-#from argostranslate import package, translate
+from argostranslate import package, translate
+import argostranslate
 
 #testing translation
 #import argostranslate.package
@@ -92,7 +93,7 @@ def get_all_testing_scenarios(var1_list_options, var2_list_options, var3_list_op
         for y in var2_list_options:
             for z in var3_list_options:
                 list_unique_test_combinations.append([x,y,z])
-    
+
     df_testing_options = pd.DataFrame(list_unique_test_combinations)
 
     return list_unique_test_combinations, df_testing_options
@@ -139,13 +140,13 @@ def overview_to_app():
     st.subheader('Quick overview to this app:')
     st.write('This app provides functionality to undertake qualitative analysis, using techniques such as sentiment analysis, clustering, topic modelling, keyword extraction etc.')
     st.write("These might all be new terms to you, but don't worry! There is an example page that illustrates some of the principles.")
-    
+
     st.subheader('Your responsibilities in using this tool:')
     st.write('This tool contains functionality to apply NLP qualitative analysis methods to text. You are free to use this but **do so at your own risk, and it is your responsibility to ensure it complies with your own organisational policies prior to your use of it.** Test data is loaded by default when no file is uploaded, so you can easily interact with the tool / see the nature of the outputs. You can of course download the code from the repo and run the tool locally.')
 
     st.subheader('How to use the app:')
     st.write("The app consists of several pages. Each page provides a specific function or task with regards to qualitative analysis of text. The only core or mandatory step is to run through the data prep page first, after that you can pick and choose to run 1 / some / all of the aother pages' functionality as you require.")
-    
+
     st.subheader("Got an idea to improve the app?")
     st.write("Feature suggestions, offers to collaborate etc. all welcome - get in touch! 🫱🏼‍🫲🏾😀")
 
@@ -155,10 +156,10 @@ def how_nlp_works():
     #st.title('Sentiment Analysis NLP App')
     st.subheader(':green[Illustrating how NLP sentiment analysis works]')
     st.write('Adapted from: https://www.youtube.com/watch?v=3eaUFqB6Xfo&t=335s')
-    
+
     st.write("Each word in a given string of text is analysed and given a polarity and a subjectivity score. The polarity score is used to indicate whether the word is deemed to be positive, negative or neutral in tone (or sentiment). If the polarity score is >=0.5, the word is classed as positive. If it is <= -0.5 it is classed as negative. If it is inbetween, it is deemed to be neutral. The positive and negative polarity scores are averaged to give an overall score which is used to determine the sentiment of the text as a whole. Enter some text below to see this in action.")
 
-   
+
     #st.subheader('Text Entry')
     with st.form(key='nlpform'):
         raw_text = st.text_area('Enter some text here...')
@@ -167,7 +168,7 @@ def how_nlp_works():
     #layout
     col1, col2 = st.columns(2)
     if submit_button:
-        
+
         with col1:
             st.info('Results')
             #use text blob to determine sentiment polarity and subjectivity
@@ -208,7 +209,7 @@ def example_page():
     st.title('Sentiment Analysis NLP App')
     st.subheader('Illustrating how NLP sentiment analysis works')
     st.write('Adapted from: https://www.youtube.com/watch?v=3eaUFqB6Xfo&t=335s')
-    
+
     menu = ['Home', 'About']
     choice = st.sidebar.selectbox('Menu', menu)
 
@@ -276,7 +277,7 @@ def create_pie_chart(dataframe, column_label, chart_title):
 
     # Create the pie chart
     #ax.figure(figsize=(8, 8))
-    
+
     ax.pie(counts, labels=counts.index, autopct='%1.1f%%', startangle=140)
     #ax.title(chart_title)
     ax.set_title(chart_title)
@@ -392,9 +393,9 @@ def detect_anomalies(df, col_name_containing_text, contamination_param_threshold
   Return these as a df and a list containing the strings detected.
 
   Notes on the function:
-  can adjust the threshold for anomaly detection based on use case specific 
-  requirements and the characteristics of the data in scope. 
-  If not detecting outliers or only 1 / few, can experiment with the threshold 
+  can adjust the threshold for anomaly detection based on use case specific
+  requirements and the characteristics of the data in scope.
+  If not detecting outliers or only 1 / few, can experiment with the threshold
   or consider checking the distribution of anomaly scores to set a suitable threshold.
   """
 
@@ -422,7 +423,7 @@ def detect_anomalies(df, col_name_containing_text, contamination_param_threshold
   #(hard coded below to be less than zero)
   #Predict anomaly scores (the lower, the more abnormal) - test line
   anomaly_scores = clf.decision_function(X)
-  
+
   # Identify and print anomalies based on the anomaly scores
   #anomalies = df[anomaly_scores < 0]
   #list_of_anomaly_text = [row[col_name_containing_text] for index, row in anomalies.iterrows()]
@@ -450,7 +451,7 @@ def detect_anomalies(df, col_name_containing_text, contamination_param_threshold
 def preprocess_reviews(df, col_with_text):
     # Initialize NLTK's English stop words
     stop_words = set(stopwords.words("english"))
-    
+
     # Function to remove punctuation and stop words from a text
     def clean_text(text):
         # Remove punctuation
@@ -463,7 +464,7 @@ def preprocess_reviews(df, col_with_text):
 
     # Apply the cleaning function to the review column
     df[col_with_text] = df[col_with_text].apply(clean_text)
-    
+
     return df
 # --------------------------------------------
 
@@ -488,14 +489,14 @@ def determine_sentiment(df, col_with_sentiment_text, compound_score_threshold):
 # --------------------------------------------
 
 def single_df_field_selector(
-        df, 
+        df,
         question_text,
         help_string,
         placeholder_text = 'Choose an option'
         ):
 
     """
-    function to insert streamlit single selection box 
+    function to insert streamlit single selection box
     to choose one of the columns present in the df
     """
 
@@ -505,20 +506,20 @@ def single_df_field_selector(
         placeholder=placeholder_text,
         help=help_string
         )
-    
+
     return selected_variable
 
 # --------------------------------------------
 
 def multi_df_field_selector(
-        df, 
+        df,
         question_text,
         help_string,
         placeholder_text = 'Choose option(s)'
         ):
 
     """
-    function to insert streamlit multi selection box 
+    function to insert streamlit multi selection box
     to choose n number of the columns present in the df
     """
 
@@ -528,7 +529,7 @@ def multi_df_field_selector(
         placeholder=placeholder_text,
         help=help_string
         )
-    
+
     return selected_variables
 
 # --------------------------------------------
@@ -574,7 +575,7 @@ def multi_label_selector(
         ):
 
     """
-    function to insert streamlit multi selection box 
+    function to insert streamlit multi selection box
     to choose n number of labels from a given column in a given df.
     can be used to isolate labels to subsequently filter a df by for e.g.
     """
@@ -585,7 +586,7 @@ def multi_label_selector(
         placeholder=placeholder_text,
         help=help_string
         )
-    
+
     return selected_labels
 
 # --------------------------------------------
@@ -599,7 +600,7 @@ def single_label_selector(
         ):
 
     """
-    function to insert streamlit single selection box 
+    function to insert streamlit single selection box
     to choose a specific label from a given column in a given df.
     can be used to isolate label to subsequently filter a df by for e.g.
     """
@@ -610,7 +611,7 @@ def single_label_selector(
         placeholder=placeholder_text,
         help=help_string
         )
-    
+
     return selected_label
 
 # --------------------------------------------
@@ -624,8 +625,8 @@ def click_button(label_text, button_key, type_str='secondary'):
     """
 
     bool_data_prep_confirmed = st.button(
-        label=label_text, 
-        key=button_key, 
+        label=label_text,
+        key=button_key,
         type=type_str)
     return bool_data_prep_confirmed
 
@@ -635,14 +636,14 @@ def get_dict_subset_df_to_known_sentiment(df, sentiment_col, list_pos_labels, li
     """
     Function to subset the source df into two dfs, where sentiment is known.
     One df for positive text, one for negative, based on user-provided labels.
-    Return a dictionary with keys (Positive or Negative) and values 
+    Return a dictionary with keys (Positive or Negative) and values
     being the respective df for these keys.
     """
     dict_sentiment = {} #dict to contain pos_df and neg_df
-    
+
     #subset source df to given positive labels
     pos_df = df[df[sentiment_col].isin(list_pos_labels)]
-    
+
     #subset source df to given negative labels
     neg_df = df[df[sentiment_col].isin(list_neg_labels)]
 
@@ -655,46 +656,46 @@ def get_dict_subset_df_to_known_sentiment(df, sentiment_col, list_pos_labels, li
 # --------------------------------------------
 
 def get_dict_subset_df_to_known_sentiment_and_demographics(
-        df, 
-        sentiment_col, 
-        list_pos_labels, 
+        df,
+        sentiment_col,
+        list_pos_labels,
         list_neg_labels,
         list_demographic_fields,
         analysis_scenario
         ):
-    
+
     """
     Function to subset the source df into two dfs, where sentiment is known.
     One df for positive text, one for negative, based on user-provided labels.
-    Return a dictionary with keys (Positive or Negative) and values 
+    Return a dictionary with keys (Positive or Negative) and values
     being the respective df for these keys.
     """
     dict_sentiment_by_demographics = {} #dict to contain pos_df and neg_df for each demographic in scope
-    
+
     dict_demographic_sentiment_pos = {}
     dict_demographic_sentiment_neg = {}
-    
+
     #positive sentiment
     if analysis_scenario == 'known_sentiment_with_demographics' or analysis_scenario == 'known_sentiment_no_demographics':
         pos_filtered_df = df[df[sentiment_col].isin(list_pos_labels)]
         neg_filtered_df = df[df[sentiment_col].isin(list_neg_labels)]
-        
+
     else:
         pos_filtered_df = df[df[sentiment_col] == 'Positive']
         neg_filtered_df = df[df[sentiment_col] == 'Negative']
-    
+
     for demographic_col in list_demographic_fields:
         #get list of unique labels within the given demographic column
         list_unique_demo_labels = list(set(df[demographic_col]))
-        
+
         dict_demo_col_to_label_df = {}
         for label in list_unique_demo_labels:
             #filter df further to the current label in the current demo field
             filtered_df_to_demo_label = pos_filtered_df[pos_filtered_df[demographic_col] == label]
             dict_demo_col_to_label_df[label] = filtered_df_to_demo_label
-        
+
         dict_demographic_sentiment_pos[demographic_col] = dict_demo_col_to_label_df
-    
+
     #negative sentiment
     for demographic_col in list_demographic_fields:
         #get list of unique labels within the given demographic column
@@ -705,20 +706,20 @@ def get_dict_subset_df_to_known_sentiment_and_demographics(
             #filter df further to the current label in the current demo field
             filtered_df_to_demo_label = neg_filtered_df[neg_filtered_df[demographic_col] == label]
             dict_demo_col_to_label_df[label] = filtered_df_to_demo_label
-                    
+
         dict_demographic_sentiment_neg[demographic_col] = dict_demo_col_to_label_df
- 
+
     dict_sentiment_by_demographics['Positive'] = dict_demographic_sentiment_pos
-    dict_sentiment_by_demographics['Negative'] = dict_demographic_sentiment_neg        
+    dict_sentiment_by_demographics['Negative'] = dict_demographic_sentiment_neg
     return dict_sentiment_by_demographics
-        
+
 # --------------------------------------------
 
 def get_dict_subset_df_to_unknown_sentiment_with_demographics(
-        df, 
+        df,
         list_demographic_fields
         ):
-    
+
     """
     Function to subset df where sentiment is not known, into dfs for each demographic.
     """
@@ -727,17 +728,17 @@ def get_dict_subset_df_to_unknown_sentiment_with_demographics(
     for demographic_col in list_demographic_fields:
         #get list of unique labels within the given demographic column
         list_unique_demo_labels = list(set(df[demographic_col]))
-        
+
         dict_demo_col_to_label_df = {}
         for label in list_unique_demo_labels:
             #filter df further to the current label in the current demo field
             filtered_df_to_demo_label = df[df[demographic_col] == label]
             dict_demo_col_to_label_df[label] = filtered_df_to_demo_label
-        
+
         dict_demo_to_label_dfs[demographic_col] = dict_demo_col_to_label_df
-    
+
     return dict_demo_to_label_dfs
-        
+
 # --------------------------------------------
 
 def remove_stopwords_and_punctuation(text):
@@ -745,10 +746,10 @@ def remove_stopwords_and_punctuation(text):
     function to remove stop words from a given single string
     """
     #nltk.download('stopwords')
-    
+
     #load stopwords
     stop_words = set(stopwords.words('english'))
-    #update stop_words to include common punctuation characters 
+    #update stop_words to include common punctuation characters
     stop_words.update(string.punctuation)
     #tokenize the words
     words = nltk.word_tokenize(text)
@@ -780,17 +781,17 @@ def check_what_languages_are_present(df, col_with_text):
     """
     Function to identify the languages present in a given col containing text
     """
-    #detect languages for each row in text col. This returns the lang code. 
-    # pass langcode to the pycountry to convert this to language name. 
+    #detect languages for each row in text col. This returns the lang code.
+    # pass langcode to the pycountry to convert this to language name.
     # Add this as a new col to df.
     df['language'] = [pycountry.languages.get(alpha_2=detect(review)).name for review in list(df[col_with_text])]
-    
+
     # Detect languages for each row in the text column
     df['language_code'] = [detect(review) for review in df[col_with_text]]
 
     #get number of each language present
     lang_counts = df['language'].value_counts().sort_values(ascending = False)
-    
+
     #use new language column to identify what languages are present
     list_unique_languages_present = lang_counts.index.tolist()
 
@@ -844,7 +845,7 @@ def filter_df_to_label(df, col_to_filter_on, label_to_filter_on):
 # --------------------------------------------
 
 def create_subset_dfs_sent_and_demo(
-        df, 
+        df,
         demographic_columns,
         str_df_has_sentiment_truth,
         positive_labels,
@@ -852,8 +853,8 @@ def create_subset_dfs_sent_and_demo(
         sentiment_col,
         analysis_scenario
         ):
-    
-    #create a dictionary to contain the dataset(s) to analyse in next stage(s) 
+
+    #create a dictionary to contain the dataset(s) to analyse in next stage(s)
     #based on user selections above
     dict_processed_dfs = {}
     #update dict with combined data set
@@ -863,9 +864,9 @@ def create_subset_dfs_sent_and_demo(
         dict_df_selections = get_dict_subset_df_to_known_sentiment(
             df,
             sentiment_col,
-            positive_labels, 
+            positive_labels,
             negative_labels)
-        
+
         analysis_method = 'known_sentiment_no_demographics'
         dict_processed_dfs[analysis_method] = dict_df_selections
 
@@ -873,12 +874,12 @@ def create_subset_dfs_sent_and_demo(
         dict_df_selections = get_dict_subset_df_to_known_sentiment_and_demographics(
             df,
             sentiment_col,
-            positive_labels, 
+            positive_labels,
             negative_labels,
             demographic_columns,
             analysis_scenario
             )
-        
+
         analysis_method = 'known_sentiment_with_demographics'
         dict_processed_dfs[analysis_method] = dict_df_selections
 
@@ -911,7 +912,7 @@ def preview_param_selections(
     """
     Function to preview the selected parameters for the analysis being run
     """
-    
+
     with st.expander(label=':red[Important!] Check and confirm your selected parameters before pressing confirm!'):
         st.write('The below outlines how the model will utilise the parameters:')
         st.write(f"The text that will be analysed is stored in the :red[{review_column}] column")
@@ -944,13 +945,13 @@ def preview_param_selections_no_sentiment(
     """
     Function to preview the selected parameters for the analysis being run
     """
-    
+
     with st.expander(label=':red[Important!] Check and confirm your selected parameters before pressing confirm!'):
         st.write('The below outlines how the model will utilise the parameters:')
         st.write(f"The text that will be analysed is stored in the :red[{review_column}] column")
 
         st.write(f"The dataset does not have known sentiment. Sentiment values will be estimated from the :red[{review_column}] column.")
-    
+
         if len(demographic_columns) > 0:
             st.write(f"Analysis will also be undertaken on the following demographics: :red[{join_strings_with_common_and_last(demographic_columns)}]")
         if str_df_has_service_label == "Yes":
@@ -1038,9 +1039,9 @@ def run_lda_topic_modelling_exc_nlp_param(
     # Apply lemmatization to your text data (prevents scenarios where a word can appear single and plural in the topic)
     processed_docs_lemmatized = [lemmatize(doc, nlp) for doc in processed_docs_no_stop]
 
-    #join the processed strings back together into a list of strings. 
+    #join the processed strings back together into a list of strings.
     joined_processed_docs_lemmatized = [' '.join(inner_list) for inner_list in processed_docs_lemmatized]
-    
+
     #test to check length of documents (i.e. contains some lemmatised text)
     #st.subheader(":red[Processed Documents Before Vectorization:]")
     #for doc in joined_processed_docs_lemmatized:
@@ -1052,7 +1053,7 @@ def run_lda_topic_modelling_exc_nlp_param(
         vectorizer = CountVectorizer(max_df=0.85, min_df=1, stop_words='english', ngram_range=(1, num_n_grams), tokenizer=lambda x: lemmatize_remove_punctuation(x, remove_punctuation))
 
     # Fit the vectorizer on processed and lemmatized documents
-    X = vectorizer.fit_transform(joined_processed_docs_lemmatized) 
+    X = vectorizer.fit_transform(joined_processed_docs_lemmatized)
 
     # Apply Latent Dirichlet Allocation (LDA) on the tf-idf matrix
     #num_topics = 5
@@ -1071,9 +1072,9 @@ def run_lda_topic_modelling_exc_nlp_param(
         df_subset = df_mapped_response_topic[df_mapped_response_topic['Dominant Topic'] == topic_num+1]
         dict_topic_to_df[f"Topic {topic_num+1}"] = df_subset
 
-    # Extract topics 
+    # Extract topics
     feature_names = vectorizer.get_feature_names_out()
-        
+
     return feature_names, lda, dict_topic_to_df, joined_processed_docs_lemmatized
 
 # --------------------------------------------
@@ -1089,7 +1090,7 @@ def run_lda_topic_modelling(
     stop_words,
     nlp
 ):
-    
+
     #call the pre-process function - removes stop words
     processed_docs_no_stop = [remove_stop_words(doc, stop_words) for doc in documents]
 
@@ -1101,9 +1102,9 @@ def run_lda_topic_modelling(
     # Apply lemmatization to your text data (prevents scenarios where a word can appear single and plural in the topic)
     processed_docs_lemmatized = [lemmatize(doc, nlp) for doc in processed_docs_no_stop]
 
-    #join the processed strings back together into a list of strings. 
+    #join the processed strings back together into a list of strings.
     joined_processed_docs_lemmatized = [' '.join(inner_list) for inner_list in processed_docs_lemmatized]
-    
+
     #test to check length of documents (i.e. contains some lemmatised text)
     #st.subheader(":red[Processed Documents Before Vectorization:]")
     #for doc in joined_processed_docs_lemmatized:
@@ -1115,7 +1116,7 @@ def run_lda_topic_modelling(
         vectorizer = CountVectorizer(max_df=0.85, min_df=1, stop_words='english', ngram_range=(1, num_n_grams), tokenizer=lambda x: lemmatize_remove_punctuation(x, remove_punctuation))
 
     # Fit the vectorizer on processed and lemmatized documents
-    X = vectorizer.fit_transform(joined_processed_docs_lemmatized) 
+    X = vectorizer.fit_transform(joined_processed_docs_lemmatized)
 
     # Apply Latent Dirichlet Allocation (LDA) on the tf-idf matrix
     #num_topics = 5
@@ -1134,9 +1135,9 @@ def run_lda_topic_modelling(
         df_subset = df_mapped_response_topic[df_mapped_response_topic['Dominant Topic'] == topic_num+1]
         dict_topic_to_df[f"Topic {topic_num+1}"] = df_subset
 
-    # Extract topics 
+    # Extract topics
     feature_names = vectorizer.get_feature_names_out()
-        
+
     return feature_names, lda, dict_topic_to_df, joined_processed_docs_lemmatized
 
 # --------------------------------------------
@@ -1157,7 +1158,7 @@ def loop_over_dict_cat_vars_run_lda_topic_modelling(
     dict_cat_col_to_label_to_model_wordcloud = {}
 
     for cat_var in list_cat_variables_to_analyse_by:
-        
+
         dict_unique_label_to_model_outputs ={}
         for label_index in range(len(dict_cat_col_unique_labels[cat_var])):
             unique_label = dict_cat_col_unique_labels[cat_var][label_index]
@@ -1199,15 +1200,15 @@ def run_all_scenarios_odds_ratio(
     ):
     """
     Function to undertake Odds Ratio for each of a given demographic group, passed to the function.
-    With 95% confidence interval (default value in function, can be adjusted if required) 
+    With 95% confidence interval (default value in function, can be adjusted if required)
     """
     dict_results_all_unique_labels = {}
-    
+
     for col in list_demographics_selected:
         list_unique_labels = list(set(text_dataset[col]))
 
         for unique_label in list_unique_labels:
-            
+
             subset_df_exposed = text_dataset[text_dataset[col] == unique_label]
             subset_df_not_exposed = text_dataset[text_dataset[col] != unique_label]
 
@@ -1216,7 +1217,7 @@ def run_all_scenarios_odds_ratio(
                 b = np.sum(subset_df_exposed[f"{sentiment_col}_binary"] == "Negative")
                 c = np.sum(subset_df_not_exposed[f"{sentiment_col}_binary"] == "Positive")
                 d = np.sum(subset_df_not_exposed[f"{sentiment_col}_binary"] == "Negative")
-            
+
             else:
                 a = np.sum(subset_df_exposed[sentiment_col] == "Positive")
                 b = np.sum(subset_df_exposed[sentiment_col] == "Negative")
@@ -1224,7 +1225,7 @@ def run_all_scenarios_odds_ratio(
                 d = np.sum(subset_df_not_exposed[sentiment_col] == "Negative")
 
             #dict_unique_labels[col] = list_unique_labels
-        
+
             #list_odds_ratio = []
             #list_log_odds_ratio = []
             #list_standard_error = []
@@ -1238,7 +1239,7 @@ def run_all_scenarios_odds_ratio(
             #d = np.sum(df_not_exposed[outcome_column] == bad_outcome_label[0])
 
             if a == 0 or b == 0 or c == 0 or d == 0:
-                #this could be improved later - e.g. reporting "inf" (as divide by 0) 
+                #this could be improved later - e.g. reporting "inf" (as divide by 0)
                 #and then running fischers exact test.
                 pass
             else:
@@ -1264,7 +1265,7 @@ def run_all_scenarios_odds_ratio(
                 dict_results_thisunique_label['standard_error'] = standard_error
                 dict_results_thisunique_label['lower_bound'] = lower_bound
                 dict_results_thisunique_label['upper_bound'] = upper_bound
-                
+
 
                 if lower_bound < 1 and upper_bound < 1:
                     sig_bool = True
@@ -1282,10 +1283,10 @@ def run_all_scenarios_odds_ratio(
 
                 else:
                     pass
-                
+
                 dict_results_all_unique_labels[f"{col}-{unique_label}"] = dict_results_thisunique_label
-            
-            
+
+
     return dict_results_all_unique_labels
 
 # --------------------------------------------
@@ -1317,8 +1318,8 @@ def get_sentiment_analysis_summary(
         df_english_reviews_no_stopwords_pos_with_sentiment = determine_sentiment(df_english_reviews_pos, review_col_no_stopwords, 0.05)
         df_english_reviews_no_stopwords_neg_with_sentiment = determine_sentiment(df_english_reviews_neg, review_col_no_stopwords, 0.05)
 
-        #TODO: Add expanders beneath each summary table, to present each df (positive / neg respectively) containing the records 
-        #that the function labelled as negative, or positive, ?or neutral. Function will need adjusting for this to be done. 
+        #TODO: Add expanders beneath each summary table, to present each df (positive / neg respectively) containing the records
+        #that the function labelled as negative, or positive, ?or neutral. Function will need adjusting for this to be done.
 
         st.write('The below tables indicate how well the sentiment analysis has performed, where a ground truth is known (e.g. FFT)')
         col1, col2 = st.columns(2)
@@ -1343,12 +1344,12 @@ def run_sentiment_topic_modelling_overall(
         stop_words
 ):
     """
-    Function to run the overall topic modelling for a combined data set. Currently called in the sentiment analysis section of the app. 
+    Function to run the overall topic modelling for a combined data set. Currently called in the sentiment analysis section of the app.
     """
     documents = df[survey_responses].dropna().values.tolist()
-    
+
     nlp = spacy.load("en_core_web_sm")
-    
+
     #call nested function to run lda model
     feature_names, lda, dict_topic_to_df, joined_processed_docs_lemmatized = run_lda_topic_modelling(
         vectorizer_method,
@@ -1360,7 +1361,7 @@ def run_sentiment_topic_modelling_overall(
         survey_responses,
         stop_words,
         nlp)
-    
+
     return feature_names, lda, dict_topic_to_df, joined_processed_docs_lemmatized
 # --------------------------------------------
 
@@ -1375,38 +1376,38 @@ def run_sentiment_topic_modelling_by_cat_var(
     list_cat_variables,
     analysis_scenario,
     dict_sentiment_cat_var_dfs):
-    
+
     """
-    Function to run the overall topic modelling for a combined data set. Currently called in the sentiment analysis section of the app. 
+    Function to run the overall topic modelling for a combined data set. Currently called in the sentiment analysis section of the app.
     """
 
     nlp = spacy.load("en_core_web_sm")
 
     dict_results_for_cat_variables = {}
     list_sentiment_labels = ['Positive', 'Negative']
-    
+
     for cat_var in list_cat_variables:
 
         dict_sentiment_results = {}
         for sentiment in list_sentiment_labels:
-            
+
             dict_results_unique_label = {}
             #for unique_label in st.session_state['dict_processed_data'][analysis_scenario][sentiment][cat_var].keys():
             for unique_label in dict_sentiment_cat_var_dfs[analysis_scenario][sentiment][cat_var].keys():
-                
+
                 #subset_df = st.session_state['dict_processed_data'][analysis_scenario][sentiment][cat_var][unique_label]
                 subset_df = dict_sentiment_cat_var_dfs[analysis_scenario][sentiment][cat_var][unique_label]
-                
+
                 #test print
                 #st.write(dict_sentiment_cat_var_dfs)
                 #try:
                 documents = subset_df[survey_responses].dropna().values.tolist()
-                
+
                 #test print
                 #st.write(f"{cat_var} - {sentiment} - {unique_label} - {len(documents)}")
 
                 #call nested function to run lda model
-                #try: 
+                #try:
                 feature_names, lda, dict_topic_to_df, joined_processed_docs_lemmatized = run_lda_topic_modelling(
                 vectorizer_method,
                 num_n_grams,
@@ -1423,7 +1424,7 @@ def run_sentiment_topic_modelling_by_cat_var(
                 dict_model_outputs['lda'] = lda
                 dict_model_outputs['dict_topic_to_df'] = dict_topic_to_df
                 dict_model_outputs['joined_processed_docs_lemmatized'] = joined_processed_docs_lemmatized
-                
+
                 #except:
                 #    dict_model_outputs = {}
                 #    dict_model_outputs['feature_names'] = 'not run'
@@ -1452,9 +1453,9 @@ def get_and_render_known_sentiment_overview(
         review_col_no_stopwords,
         binary_sentiment_col
 ):
-    
+
     """
-    Function to be called when the processed data has known sentiment. 
+    Function to be called when the processed data has known sentiment.
     Derives an overview summary and presents this on the page. No demographic breakdown at this stage.
     """
 
@@ -1462,8 +1463,8 @@ def get_and_render_known_sentiment_overview(
     #Overview of the data set
     #------------------------------------------
     st.subheader(title)
-    st.write("""The below pie chart indicates the range and relative frequency of 
-                languages present in the data. The word clouds show the frequency 
+    st.write("""The below pie chart indicates the range and relative frequency of
+                languages present in the data. The word clouds show the frequency
                 of words in positive and negative English reviews, respectively.""")
     col1, col2, col3 = st.columns(3)
 
@@ -1473,7 +1474,7 @@ def get_and_render_known_sentiment_overview(
 
         #split df into subset df for English reviws
         df_english_reviews = subset_df_for_specific_langage(text_dataset, 'language', 'English')
-    
+
     df_english_reviews_pos = subset_df_for_specific_langage(df_english_reviews, binary_sentiment_col, 'Positive')
     df_english_reviews_neg = subset_df_for_specific_langage(df_english_reviews, binary_sentiment_col, 'Negative')
 
@@ -1481,19 +1482,19 @@ def get_and_render_known_sentiment_overview(
         #st.write('Positive English Reviews')
         #create_word_cloud(df_english_reviews_pos, 'Review', 'Positive English Reviews', 'cool')
         create_word_cloud(df_english_reviews_pos, review_col, 'Positive English Reviews', 'cool')
-    
+
     with col3:
         #st.write('Negative English Reviews')
         #create_word_cloud(df_english_reviews_neg, 'Review', 'Negative English Reviews', 'hot')
         create_word_cloud(df_english_reviews_neg, review_col, 'Negative English Reviews', 'hot')
-    
+
 
     #------------------------------------------
-    #Identify outlier comments 
+    #Identify outlier comments
     #TODO adjust function to generate outliers to ensure any comments marked as "unpublishable" are removed from the source data so cannot be identified as an outlier
     #------------------------------------------
     st.subheader('Identify the most extreme outlier comments for each sentiment type')
-        
+
     st.write('Any positive or negative outlier reviews are listed below for consideration. Note, these represent those reviews that diverge from the majority.')
     col1, col2 = st.columns(2)
     with col1:
@@ -1540,7 +1541,7 @@ def run_lda_topic_modelling_return_X(
     stop_words,
     nlp
 ):
-    
+
     #call the pre-process function - removes stop words
     processed_docs_no_stop = [remove_stop_words(doc, stop_words) for doc in documents]
 
@@ -1552,9 +1553,9 @@ def run_lda_topic_modelling_return_X(
     # Apply lemmatization to your text data (prevents scenarios where a word can appear single and plural in the topic)
     processed_docs_lemmatized = [lemmatize(doc, nlp) for doc in processed_docs_no_stop]
 
-    #join the processed strings back together into a list of strings. 
+    #join the processed strings back together into a list of strings.
     joined_processed_docs_lemmatized = [' '.join(inner_list) for inner_list in processed_docs_lemmatized]
-    
+
     #test to check length of documents (i.e. contains some lemmatised text)
     #st.subheader(":red[Processed Documents Before Vectorization:]")
     #for doc in joined_processed_docs_lemmatized:
@@ -1566,7 +1567,7 @@ def run_lda_topic_modelling_return_X(
         vectorizer = CountVectorizer(max_df=0.85, min_df=1, stop_words='english', ngram_range=(1, num_n_grams), tokenizer=lambda x: lemmatize_remove_punctuation(x, remove_punctuation))
 
     # Fit the vectorizer on processed and lemmatized documents
-    X = vectorizer.fit_transform(joined_processed_docs_lemmatized) 
+    X = vectorizer.fit_transform(joined_processed_docs_lemmatized)
 
     # Apply Latent Dirichlet Allocation (LDA) on the tf-idf matrix
     #num_topics = 5
@@ -1585,9 +1586,9 @@ def run_lda_topic_modelling_return_X(
         df_subset = df_mapped_response_topic[df_mapped_response_topic['Dominant Topic'] == topic_num+1]
         dict_topic_to_df[f"Topic {topic_num+1}"] = df_subset
 
-    # Extract topics 
+    # Extract topics
     feature_names = vectorizer.get_feature_names_out()
-        
+
     return feature_names, lda, dict_topic_to_df, joined_processed_docs_lemmatized, X
 
 #----------------------------------
@@ -1600,12 +1601,12 @@ def find_optimal_lda_params(
     vectorizer_methods,
     remove_punctuation_values,
     ngram_ranges
-):  
-    
+):
+
     documents = df[survey_responses].dropna().values.tolist()
 
     nlp = spacy.load("en_core_web_sm")
-    
+
     perplexity_results = []
 
 
@@ -1685,7 +1686,7 @@ def translate_text_revised(df, review_col):
     """
     # Initialize the translator
     translator = Translator()
-    
+
     # Translate text and store in list via comprehension
     list_translated_reviews = []
 
@@ -1770,7 +1771,7 @@ def translate_text_revised_argo(df, review_col):
 #    lang = f'{source} -> {target}'
 #    source_lang = [model for model in translate.get_installed_languages() if lang in map(repr, model.translations_from)]
 #    target_lang = [model for model in translate.get_installed_languages() if lang in map(repr, model.translations_to)]
-    
+
 #    return source_lang[0].get_translation(target_lang[0])
 
 
@@ -1791,7 +1792,7 @@ def create_translation_models_dict(df_series):
     The keys are in the format f"{source_lang}-English", and values are the corresponding translation models.
     """
     translation_models_dict = {}
-    
+
     # Get unique language pairs in the DataFrame series
     language_pairs = df_series.unique()
 
@@ -1814,7 +1815,7 @@ def translate_text(df, lang_code_col, review_col, language_col):
 
     argostranslate.package.update_package_index()
     available_packages = argostranslate.package.get_available_packages()
-    
+
     to_code = "en"
     with st.spinner(text='Attempting to translate non-English text... please wait.'):
         for index, row in df.iterrows():
@@ -1823,7 +1824,7 @@ def translate_text(df, lang_code_col, review_col, language_col):
                 list_translations.append(row[review_col])
             else:
                 try:
-                    
+
                     package_to_install = next(filter(lambda x: x.from_code == from_code and x.to_code == to_code, available_packages))
                     argostranslate.package.install_from_path(package_to_install.download())
                     # Translate
@@ -1833,7 +1834,7 @@ def translate_text(df, lang_code_col, review_col, language_col):
                 except:
                     list_translations.append(None)
                     non_translated_languages.append(row[language_col])
-    
+
     df = df.rename(columns={review_col: f"{review_col}_original"})
 
     df[f'{review_col}'] = list_translations
@@ -1867,10 +1868,10 @@ def topic_modelling_by_demographic(text_dataset):
         try:
             with st.expander(label=var_label_combination):
                 tab1, tab2 = st.tabs(['Positive', 'Negative'])
-                
+
                 cat_var = var_label_combination.split('-')[0]
                 unique_label = var_label_combination.split('-')[1]
-                
+
                 with tab1: #positive #TODO replicate the change in this positive section within the tab 2 negative section
                     subset_df_current_unique_label = text_dataset[text_dataset[cat_var] == unique_label]
                     subset_df_positive = subset_df_current_unique_label[subset_df_current_unique_label[sent_col] == "Positive"]
@@ -1902,7 +1903,7 @@ def topic_modelling_by_demographic(text_dataset):
                         dict_model_results = _dict_results_for_cat_variables['Positive'][cat_var][unique_label]
                         #st.write(dict_model_results)
                         #for topic_idx, topic in enumerate(dict_model_results['lda'].components_):
-                        
+
                         if dict_model_results == 'Not run':
                             st.write('Topic modelling was not run.')
                         else:
@@ -1910,12 +1911,12 @@ def topic_modelling_by_demographic(text_dataset):
                                 top_words_idx = topic.argsort()[:-10 - 1:-1]
                                 top_words = [dict_model_results['feature_names'][i] for i in top_words_idx]
                                 st.write(f"**Topic {topic_idx + 1}:** {', '.join(top_words)}")
-                            
+
                             #render df of responses
                             for topic_num in range(num_topics):
                                 st.subheader(f"Topic {topic_num+1}")
                                 st.dataframe(_dict_results_for_cat_variables['Positive'][cat_var][unique_label]['topic_dfs'][f"Topic {topic_num+1}"])
-                    
+
         except KeyError:
             st.write('Insufficient data to run this analysis.')
             pass
@@ -1931,7 +1932,7 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
     ):
         #first create a df for all processed data (which should ALWAYS be present)
         #text_dataset = st.session_state['dict_processed_data']['all_data']
-        
+
         #get the column names to containing the text we want to analyse
         #review_col = st.session_state['review_column']
         review_col_no_stopwords = f"{review_col}_no_stopwords"
@@ -1941,14 +1942,14 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
         st.title(':green[**Variation by demographic group**]')
         st.write('This sections seeks to derive insight as to variation in reported experience by the chosen demographic groups in scope')
         st.subheader('***Odds Ratio***')
-        st.write("""An Odds Ratio calculation has been used below to determine 
-                 whether there is any variation in the liklihood of reporting a 
-                 positive experience by each demographic group in scope. 
-                 Effectively, using ethnicity as an example, this shows the likelihood 
-                 of reporting a positive experience by, say, patients with a White ethnicity, 
-                 compared to all other ethnicities, and repeats this for all unique labels of 
+        st.write("""An Odds Ratio calculation has been used below to determine
+                 whether there is any variation in the liklihood of reporting a
+                 positive experience by each demographic group in scope.
+                 Effectively, using ethnicity as an example, this shows the likelihood
+                 of reporting a positive experience by, say, patients with a White ethnicity,
+                 compared to all other ethnicities, and repeats this for all unique labels of
                  each categorical / demographic variables selected on the prep page.""")
-        
+
 
         #extract demographics selected - hardcoded for now via index 0
         #list_demographics_selected = st.session_state['demographic_columns']
@@ -1963,7 +1964,7 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
             )
 
         df_or_demographic_results = pd.DataFrame(dict_results_all_unique_labels).T
-        
+
         #st.dataframe(df_or_demographic_results)
 
         if 'significant' in df_or_demographic_results.columns:
@@ -1973,7 +1974,7 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
                 st.dataframe(df_subset_sig)
             else:
                 st.write('All Odds Ratios returned :red[**non-significant**] results. The results can be viewed in the expander below.')
-            
+
             with st.expander(label='Click for all OR ratio results'):
                 st.dataframe(df_or_demographic_results)
         else:
@@ -1981,7 +1982,7 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
 # --------------------------------------------
 #Section to provide word clouds for positive and negative responses (ground truth) by demographic group
 # --------------------------------------------
-        
+
         st.subheader('***Demographic summaries***')
         st.write('The below expanders contain findings for each selected individual demographic. Where outlier comments for this group have been detected, these are included in addition to a Word cloud. Both are provided for positive and negative feedback, respectively. ')
 
@@ -1994,17 +1995,17 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
         for cat_var in list_demographics_selected:
             for unique_label in list(set(text_dataset[cat_var])):
                 list_var_label_combinations.append(f"{cat_var}-{unique_label}")
-        
+
         #st.write(list_var_label_combinations)
 
         for var_label_combination in list_var_label_combinations:
             try:
                 with st.expander(label=var_label_combination):
                     tab1, tab2 = st.tabs(['Positive', 'Negative'])
-                    
+
                     cat_var = var_label_combination.split('-')[0]
                     unique_label = var_label_combination.split('-')[1]
-                    
+
                     with tab1: #positive #TODO replicate the change in this positive section within the tab 2 negative section
                         subset_df_current_unique_label = text_dataset[text_dataset[cat_var] == unique_label]
                         subset_df_positive = subset_df_current_unique_label[subset_df_current_unique_label[sent_col] == "Positive"]
@@ -2036,7 +2037,7 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
                             dict_model_results = _dict_results_for_cat_variables['Positive'][cat_var][unique_label]
                             #st.write(dict_model_results)
                             #for topic_idx, topic in enumerate(dict_model_results['lda'].components_):
-                            
+
                             if dict_model_results == 'Not run':
                                 st.write('Topic modelling was not run.')
                             else:
@@ -2044,19 +2045,19 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
                                     top_words_idx = topic.argsort()[:-10 - 1:-1]
                                     top_words = [dict_model_results['feature_names'][i] for i in top_words_idx]
                                     st.write(f"**Topic {topic_idx + 1}:** {', '.join(top_words)}")
-                                
+
                                 #render df of responses
                                 for topic_num in range(num_topics):
                                     st.subheader(f"Topic {topic_num+1}")
                                     st.dataframe(_dict_results_for_cat_variables['Positive'][cat_var][unique_label]['topic_dfs'][f"Topic {topic_num+1}"])
-                        
+
                         except KeyError:
                             st.write('Insufficient data to run this analysis.')
                             pass
 
                     with tab2: #negative
                         subset_df_negative = subset_df_current_unique_label[subset_df_current_unique_label[sent_col] == "Negative"]
-                        
+
                         #--
                         #st.write(f"got here for: {var_label_combination} - {subset_df_negative.shape}")
                         #st.dataframe(subset_df_negative)
@@ -2068,20 +2069,20 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
                                 st.subheader('Negative outliers:')
                                 for neg_exception in neg_list_of_anomaly_text:
                                     st.write(f'"{neg_exception}"')
-                            
+
                             #render word cloud - negative
                             st.subheader('Word Cloud of Negative Feedback')
                             st.pyplot(func.categorical_create_word_cloud(subset_df_negative, review_col, f'Wordcloud: {review_col} - {cat_var} - {unique_label}', 'hot'))
-                        
+
                         else:
                             st.write('Insufficient data to run this analysis.')
                             pass
-                        
+
                         #render topc modelling outputs for each demographic variable in scope
                         try:
                             st.subheader('Topic modelling outputs')
                             dict_model_results = _dict_results_for_cat_variables['Negative'][cat_var][unique_label]
-                            
+
                             if dict_model_results == 'Not run':
                                 st.write('Topic modelling was not run.')
                             else:
@@ -2089,13 +2090,13 @@ def sentiment_analysis_page_demographic_group_variation_by_service(
                                     top_words_idx = topic.argsort()[:-10 - 1:-1]
                                     top_words = [dict_model_results['feature_names'][i] for i in top_words_idx]
                                     st.write(f"**Topic {topic_idx + 1}:** {', '.join(top_words)}")
-                        
+
                             #render df of responses
                                 for topic_num in range(num_topics):
                                     st.subheader(f"Topic {topic_num+1}")
                                     st.dataframe(_dict_results_for_cat_variables['Negative'][cat_var][unique_label]['topic_dfs'][f"Topic {topic_num+1}"])
-                            
-                            
+
+
                         except KeyError:
                             st.write('Insufficient data to run this analysis.')
                             pass

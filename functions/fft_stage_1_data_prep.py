@@ -30,8 +30,8 @@ def data_prep():
     #Select the data set containing text data
 
     text_dataset_file = st.file_uploader(
-            'Please select a .csv file containing your text data', 
-            type=['.csv'], 
+            'Please select a .csv file containing your text data',
+            type=['.csv'],
             label_visibility="visible")
 
     num_rows = 5
@@ -49,7 +49,7 @@ def data_prep():
     else:
         text_dataset = pd.read_csv(text_dataset_file)
         func.preview_df(text_dataset, f'Click to preview {first_or_last} {num_rows} rows of your chosen dataset', first_or_last, num_rows)
-    
+
     df_data_quality = (text_dataset.isnull().sum().to_frame()).rename(columns={0:'Count Missing'})
     df_data_quality['missing_%'] = round((df_data_quality['Count Missing'] / text_dataset.shape[0])*100,1)
     with st.expander(f'Click to view overview of missing data (total number records: {text_dataset.shape[0]})'):
@@ -63,10 +63,10 @@ def data_prep():
     sentiment_col = []
 
     col1, col2, col3, col4 = st.columns(4)
-    with col1: 
+    with col1:
         str_df_has_sentiment_truth = func.radio_button(
-            'Does your data contain known sentiment?', 
-            ['Yes', 'No'], 
+            'Does your data contain known sentiment?',
+            ['Yes', 'No'],
             True,
             1)
 
@@ -84,7 +84,7 @@ def data_prep():
             )
             #update session state with the sentiment column
             #st.session_state['sentiment_col'] = sentiment_col
-        
+
         with col3:
             positive_labels = func.multi_label_selector(
             text_dataset,
@@ -114,7 +114,7 @@ def data_prep():
                 True,
                 1
             )
-    
+
     list_services_present = []
     service_col = ''
     if str_df_has_service_label == 'Yes':
@@ -127,7 +127,7 @@ def data_prep():
             #update session state with the sentiment column
             #st.session_state['service_col'] = service_col
             list_services_present = list(set(text_dataset[service_col]))
-        
+
         with col3:
             filter_criteria = func.single_label_selector(
                 text_dataset,
@@ -150,16 +150,16 @@ def data_prep():
     with col1:
         has_redact_col = func.radio_button(
             'Does the dataset have a col to indicate rows to redact from publication?',
-            list_options=['Yes', 'No'], 
+            list_options=['Yes', 'No'],
             horizontal_bool=True,
             default_index=1)
-        
+
         st.session_state['has_redact_col'] = has_redact_col
 
     if has_redact_col == 'Yes':
         with col2:
             redact_col = func.single_df_field_selector(text_dataset, 'Select the column redaction labels', help_string='This is the column in the data set containing the labels that can be used to remove rows from publication')
-    
+
         with col3:
             redact_text = func.single_label_selector(
                 text_dataset,
@@ -171,12 +171,12 @@ def data_prep():
         st.session_state['redact_col'] = redact_col
         st.session_state['redact_text'] = redact_text
 
-    #positive_labels = []
-    #negative_labels = []
+    positive_labels = []
+    negative_labels = []
 
     #else:
     #    st.session_state['sentiment_col'] = 'Sentiment'
-    
+
     st.write('***Select the text to analyse***')
     #select the labels pertaining to positive or negative sentiment in the df
     review_column = []
@@ -189,7 +189,7 @@ def data_prep():
             'Select the field containing the text to analyse',
             None
         )
-        
+
         #update session state with the review column
         #st.session_state['review_column'] = review_column
 
@@ -204,10 +204,10 @@ def data_prep():
         #st.session_state['demographic_columns'] = demographic_columns
 
     #if needed, add data selection here
-        
+
     #--------------------------------------------------------
     #date range filter section to avoid memory challenge
-    #currently commented out due to formatting inconsistencies in the source data. needs finishing. 
+    #currently commented out due to formatting inconsistencies in the source data. needs finishing.
 
     #date_field = st.selectbox(label='Select the field containing the date the wait closed', options=text_dataset.columns)
 
@@ -245,7 +245,7 @@ def data_prep():
     #    with col3:
     #        end_date = np.datetime64(st.date_input(f"Select a **to** date between {earliest_date} and {latest_date}", value=None))
 
-        
+
     #    df_filtered_date_range = text_dataset[
     #        ((text_dataset['date_column_DT'] >= start_date) & (text_dataset['date_column_DT'] <= end_date))  # Retain values within the specified range
     #    ]
@@ -260,9 +260,9 @@ def data_prep():
     #st.dataframe(df_filtered_date_range)
 #--------------------------------------------------------
 
-    
+
     translate_option = func.radio_button(
-        'How do you want to handle non-English reviews?', 
+        'How do you want to handle non-English reviews?',
         ["Translate to English and retain", "Don't translate and remove", "Don't translate and retain"], True, default_index=2)
 
     #summary of selections
@@ -293,7 +293,7 @@ def data_prep():
     #st.write(text_dataset.shape)
     button_data_prep = func.click_button('Confirm selections', 'Data_Prep', type_str='secondary')
     #st.write(text_dataset.shape)
-    
+
     if button_data_prep:
         st.write("Parameters are set up! 👍🏻")
         #st.write(text_dataset[text_dataset[review_column].isna()].shape)
@@ -304,7 +304,7 @@ def data_prep():
         #st.dataframe(text_dataset[text_dataset[review_column].isna()])
         #text_dataset.dropna(subset=review_column, inplace=True) #removes Null values from the text in scope #moved below after binary sentiment col added
         #text_dataset = text_dataset[text_dataset[review_column] != 'Did not answer'] #Assumes all have this exact text in for a did not answer #moved below after binary sentiment col added
-        
+
         #st.write(text_dataset.shape)
 
         #update the df with a _binary column, based on known sentiment labels provided above
@@ -316,13 +316,13 @@ def data_prep():
                 text_dataset[sentiment_col].isin(negative_labels), 'Negative', 'Other')
                 )
 
- 
-            
+
+
         else:
             #no known sentiment, therefore run sentiment analysis
             #text_dataset = func.determine_sentiment()
             text_dataset = func.determine_sentiment(text_dataset, review_column, 0.05)
-        
+
         #take copy of text_dataset to test how na's are being identified
         text_dataset_inc_na_rows = text_dataset.copy(deep=True)
         text_dataset.dropna(subset=review_column, inplace=True) #removes Null values from the text in scope
@@ -341,7 +341,7 @@ def data_prep():
         #st.dataframe(text_dataset)
 
         #st.write('')
-        
+
         #translate if that option has been selected
         #test_dict_translation = func.create_translation_models_dict(text_dataset['language_code'])
         #st.write(test_dict_translation)
@@ -364,20 +364,20 @@ def data_prep():
             st.write(':red[NOTE: at this time subsequent stages only used English reviews. Method for translation to be added here.]')
             #filters df to english lang only. Needs updating to handle non-English languages.
             #text_dataset_en = func.filter_df_to_label(text_dataset, 'language', 'English') # original working when removing non English text
-            
+
             df_lang_checked, str_languages_present = func.check_what_languages_are_present_revised(text_dataset, review_column)
             st.write(str_languages_present)
 
             #update session state with the df with all langs present
             st.session_state['all_df_all_langs_present'] = df_lang_checked
-                
+
             text_dataset = func.filter_df_to_label(text_dataset, 'language', 'English')
-        
+
         elif translate_option == "Don't translate and retain":
             pass
             #st.write('Only English reviews retained')
             #st.write(f"This is the shape: {text_dataset.shape}")
-    
+
     #--------------------------------------------------------------------
     #<<< Edit df to retain only english language reviews - need to adjust to handle non-English reviews >>>
     #--------------------------------------------------------------------
@@ -385,7 +385,7 @@ def data_prep():
         #test stopword removal
         text_dataset_en_sw_removed = func.remove_stopwords_from_df_col(
             text_dataset, #text_dataset_en previously and working when removing non-English reviews
-            review_column, 
+            review_column,
             f"{review_column}_no_stopwords")
 
         #TODO update this line when tranlation incorporated - functions below to subset text data refer to df variable
@@ -395,7 +395,7 @@ def data_prep():
     #<<< update the session state >>>
     #--------------------------------------------------------------------
         # ----------------------------
-        #update session state 
+        #update session state
         # << remove keys if already present >>
         if 'str_df_has_sentiment_truth' in st.session_state.keys():
             del st.session_state['str_df_has_sentiment_truth']
@@ -427,7 +427,7 @@ def data_prep():
         st.session_state['str_df_has_sentiment_truth'] = str_df_has_sentiment_truth
         #update session state with str_df_has_sentiment_truth
         st.session_state['str_df_has_service_label'] = str_df_has_service_label
-        
+
         #update session state with the sentiment column
         if str_df_has_service_label == 'Yes':
             st.session_state['service_col'] = service_col
@@ -463,7 +463,7 @@ def data_prep():
             dict_df_selections = func.get_dict_subset_df_to_known_sentiment(
                     df,
                     sentiment_col,
-                    positive_labels, 
+                    positive_labels,
                     negative_labels)
             dict_processed_dfs[analysis_method] = dict_df_selections
 
@@ -473,7 +473,7 @@ def data_prep():
             dict_df_selections = func.get_dict_subset_df_to_known_sentiment_and_demographics(
                     df,
                     sentiment_col,
-                    positive_labels, 
+                    positive_labels,
                     negative_labels,
                     demographic_columns,
                     analysis_method)
@@ -485,21 +485,21 @@ def data_prep():
             dict_df_selections = func.get_dict_subset_df_to_known_sentiment(
                     df,
                     'Sentiment',
-                    positive_labels, 
+                    positive_labels,
                     negative_labels)
             dict_processed_dfs[analysis_method] = dict_df_selections
 
         elif str_df_has_sentiment_truth == 'No' and len(demographic_columns) > 0:
             analysis_method = 'unknown_sentiment_with_demographics'
             #dict_df_selections = func.get_dict_subset_df_to_unknown_sentiment_with_demographics(
-            #df, 
+            #df,
             #demographic_columns)
             #dict_processed_dfs[analysis_method] = dict_df_selections
 
             dict_df_selections = func.get_dict_subset_df_to_known_sentiment_and_demographics(
                     df,
                     'Sentiment',
-                    [], 
+                    [],
                     [],
                     demographic_columns,
                     analysis_method)
@@ -519,17 +519,17 @@ def data_prep():
             st.session_state['list_services_present'] = list_services_present
 
             #create
-            
+
             dict_service_to_dict_processed_dfs = {}
             for service in list_services_present:
-                
+
                 #subset source data to just THIS service
                 df_service = func.subset_df_for_specific_langage(df, service_col, service)
-                
-                #create dicts for the service 
+
+                #create dicts for the service
                 dict_processed_dfs = {}
                 dict_processed_dfs['all_data'] = df_service
-                
+
                 #then, run above functions for this subset service level df
 
                 if str_df_has_sentiment_truth == 'Yes' and len(demographic_columns) == 0:
@@ -537,7 +537,7 @@ def data_prep():
                     dict_df_selections = func.get_dict_subset_df_to_known_sentiment(
                             df_service,
                             sentiment_col,
-                            positive_labels, 
+                            positive_labels,
                             negative_labels)
                     dict_processed_dfs[analysis_method] = dict_df_selections
 
@@ -547,7 +547,7 @@ def data_prep():
                     dict_df_selections = func.get_dict_subset_df_to_known_sentiment_and_demographics(
                             df_service,
                             sentiment_col,
-                            positive_labels, 
+                            positive_labels,
                             negative_labels,
                             demographic_columns,
                             analysis_method)
@@ -559,21 +559,21 @@ def data_prep():
                     dict_df_selections = func.get_dict_subset_df_to_known_sentiment(
                             df_service,
                             'Sentiment',
-                            positive_labels, 
+                            positive_labels,
                             negative_labels)
                     dict_processed_dfs[analysis_method] = dict_df_selections
 
                 elif str_df_has_sentiment_truth == 'No' and len(demographic_columns) > 0:
                     analysis_method = 'unknown_sentiment_with_demographics'
                     #dict_df_selections = func.get_dict_subset_df_to_unknown_sentiment_with_demographics(
-                    #df, 
+                    #df,
                     #demographic_columns)
                     #dict_processed_dfs[analysis_method] = dict_df_selections
 
                     dict_df_selections = func.get_dict_subset_df_to_known_sentiment_and_demographics(
                             df_service,
                             'Sentiment',
-                            positive_labels, 
+                            positive_labels,
                             negative_labels,
                             demographic_columns,
                             analysis_method)
